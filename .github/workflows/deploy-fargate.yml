@@ -3,7 +3,7 @@ name: Deploy to AWS Fargate
 on:
   push:
     branches:
-      - master
+      - main
   workflow_dispatch:
 
 env:
@@ -11,6 +11,8 @@ env:
   ECS_CLUSTER: VenlinkCluster  # Update with your actual ECS cluster name
   ECS_SERVICE: VenLinkService  # Update with your ECS service name
   ECS_TASK_DEFINITION: arn:aws:ecs:eu-north-1:203918861989:task-definition/VenlinkTaskDefinition:1
+  SUBNETS: "subnet-0ad7c6bd9b4900ccf,subnet-06664da4ed5f213e6,subnet-0c398bfa1f35ed01b"
+  SECURITY_GROUP: "sg-01eaa66fa10fa8a78" # Replace with your actual security group ID
 
 jobs:
   deploy:
@@ -27,6 +29,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
       
-      - name: Update ECS Service
+      - name: Restart ECS Task
         run: |
-          aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --task-definition $ECS_TASK_DEFINITION --force-new-deployment
+          aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --force-new-deployment
