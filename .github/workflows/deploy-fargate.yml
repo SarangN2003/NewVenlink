@@ -10,14 +10,13 @@ env:
   AWS_REGION: eu-north-1
   ECS_CLUSTER: VenlinkCluster  # Update with your actual ECS cluster name
   ECS_SERVICE: VenLinkService  # Update with your ECS service name
-  ECS_TASK_DEFINITION: arn:aws:ecs:eu-north-1:203918861989:task-definition/VenlinkTaskDefinition:1
+  ECS_TASK_ID: 4dc178fd16904272810d8234a87b67b7
   SUBNETS: "subnet-0c398bfa1f35ed01b"
-  SECURITY_GROUP: "sg-01eaa66fa10fa8a78 (ecs-1bo6grsv) " # Replace with your actual security group ID
-
+  SECURITY_GROUP: "sg-01eaa66fa10fa8a78"
 
 jobs:
   deploy:
-    name: Deploy to AWS Fargate
+    name: Restart ECS Task
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -30,6 +29,13 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
       
-      - name: Restart ECS Task
+      - name: Stop Old ECS Task
         run: |
-          aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --force-new-deployment
+          aws ecs stop-task --cluster $ECS_CLUSTER --task $ECS_TASK_ID
+      
+      - name: Run Task Again
+        run: |
+          aws ecs run-task --cluster $ECS_CLUSTER \
+            --task-definition $ECS_TASK_DEFINITION \
+            --launch-type FARGATE \
+            --network-configuration "awsvpcConfiguration={subnets=[$SUBNETS],securityGroups=[$SECURITY_GROUP],assignPublicIp=\"ENABLED\"}"
