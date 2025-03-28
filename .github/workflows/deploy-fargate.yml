@@ -2,53 +2,31 @@ name: Deploy to AWS Fargate
 
 on:
   push:
-    branches: [ master ]
-    paths:
-      - 'Dockerfile'
-      - '**.py'
-      - 'requirements.txt'
+    branches:
+      - master
+  workflow_dispatch:
 
 env:
-  AWS_REGION: 'eu-north-1'  # Change to your region
-  ECR_REPOSITORY: 'venlinkrepo'  # Change to your ECR repo name
-  ECS_CLUSTER: 'VenlinkCluster'  # Change to your cluster
-  ECS_SERVICE: 'VenLinkService'  # Change to your service
-  CONTAINER_NAME: 'vencontainer'  # Change to your container name
+  AWS_REGION: eu-north-1
+  ECS_CLUSTER: VenlinkCluster  # Update with your actual ECS cluster name
+  ECS_SERVICE: VenLinkService  # Update with your ECS service name
+  ECS_TASK_DEFINITION: arn:aws:ecs:eu-north-1:203918861989:task-definition/VenlinkTaskDefinition:1
 
 jobs:
   deploy:
+    name: Deploy to AWS Fargate
     runs-on: ubuntu-latest
-    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
-
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
-
-    - name: Build Docker image
-      run: |
-        docker build -t ${{ env.ECR_REPOSITORY }}:${{ github.sha }} .
-
-    - name: Tag and push Docker image
-      run: |
-        docker tag ${{ env.ECR_REPOSITORY }}:${{ github.sha }} \
-          ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
-        docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
-
-    - name: Deploy to Fargate
-      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-      with:
-        task-definition: ${{ secrets.ECS_TASK_DEFINITION }}
-        service: ${{ env.ECS_SERVICE }}
-        cluster: ${{ env.ECS_CLUSTER }}
-        container-name: ${{ env.CONTAINER_NAME }}
-        image: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Update ECS Service
+        run: |
+          aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --task-definition $ECS_TASK_DEFINITION --force-new-deployment
