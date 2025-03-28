@@ -11,8 +11,9 @@ env:
   ECS_CLUSTER: VenlinkCluster  # Update with your actual ECS cluster name
   ECS_SERVICE: VenLinkService  # Update with your ECS service name
   ECS_TASK_DEFINITION: arn:aws:ecs:eu-north-1:203918861989:task-definition/VenlinkTaskDefinition:1
-  SUBNETS: "subnet-0ad7c6bd9b4900ccf,subnet-06664da4ed5f213e6,subnet-0c398bfa1f35ed01b"
-  SECURITY_GROUP: "sg-01eaa66fa10fa8a78" # Replace with your actual security group ID
+  SUBNETS: "subnet-0c398bfa1f35ed01b"
+  SECURITY_GROUP: "sg-01eaa66fa10fa8a78 (ecs-1bo6grsv) " # Replace with your actual security group ID
+
 
 jobs:
   deploy:
