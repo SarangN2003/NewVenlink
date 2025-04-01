@@ -32,32 +32,6 @@
 
 
 
-# import pytest
-# from selenium import webdriver
-# from selenium.webdriver.chrome.options import Options
-# import os
-#
-# @pytest.fixture(scope="class")
-# def setup(request):
-#     chrome_options = Options()
-#     chrome_options.add_argument("--headless")
-#     chrome_options.add_argument("--no-sandbox")
-#     chrome_options.add_argument("--disable-dev-shm-usage")
-#     chrome_options.add_argument("--disable-gpu")
-#
-#     # Set a unique user data directory to prevent conflicts
-#     user_data_dir = f"/tmp/chrome-user-data-{os.getpid()}"
-#     chrome_options.add_argument(f"--user-data-dir={user_data_dir}")
-#
-#     driver = webdriver.Chrome(options=chrome_options)
-#     driver.get("https://venlink--dev3.sandbox.my.site.com/customer/login")
-#     print("Browser successfully launched")
-#
-#     request.cls.driver = driver
-#     yield driver
-#     driver.quit()
-
-
 
 
 

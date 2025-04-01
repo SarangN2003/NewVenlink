@@ -149,11 +149,14 @@
 ######For testing
 import re
 import time
-import sys
+
 import traceback
 import pytest
-from selenium.common import NoSuchElementException, WebDriverException
+from selenium.common import NoSuchElementException, WebDriverException, TimeoutException
 from selenium.webdriver import ActionChains, Keys
+
+
+import homePage
 from Logger import BaseClass
 from homePage import HomePage1
 
@@ -196,22 +199,36 @@ class TestTwo(BaseClass):
         # Email entry
         if not re.match(r"^[\w\.-]+@[\w\.-]+\.\w+$", credentials['username']):
             raise ValueError("Invalid email format")
-        homepage.getEmail().send_keys(credentials['username'])
-        print("Entered email:", credentials['username'])
+        else:
+            homepage.getEmail().send_keys(credentials['username'])
+            print("Entered email:", credentials['username'])
 
         # Password entry
         if not re.match(r"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", credentials['password']):
             raise ValueError("Invalid password format")
-        homepage.getPassword().send_keys(credentials['password'])
-        print("Valid password entered")
+        else:
+            homepage.getPassword().send_keys(credentials['password'])
+            print("Valid password entered")
 
         # Checkbox and submit
         homepage.getCheckBox().click()
-        homepage.getSignIn().click()
-        time.sleep(3)
-        print("Sign-in button clicked successfully!")
-        print("Sign in successfully")
+        # homepage.getSignIn().click()
+        # time.sleep(3)
+        # print("Sign-in button clicked successfully!")
+        # print("Sign in successfully")
+        #
+        try:
+            homepage.getSignIn().click()
+            print("Sign-in button clicked successfully!")
+            print("Sign-in Successfully")
+        except AttributeError:
+            print("Sign in Failed")
+            raise NoSuchElementException("Sign-in button was not found")
 
+
+
+
+# New Vendor Request
     def _vendor_request(self, homepage):
         """All vendor request steps with validations"""
         print("\nStarting Vendor Request...")
@@ -233,9 +250,10 @@ class TestTwo(BaseClass):
         # Validate and enter all fields
         if not re.match(r"^[a-zA-Z]+$", vendor_data['name']):
             raise ValueError("Invalid Name Format!")
-        homepage.getName().send_keys(vendor_data['name'])
-        print("You Entered Correct Vendor Name")
-
+        else:
+            homepage.getName().send_keys(vendor_data['name'])
+            print("You Entered Correct Vendor Name")
+        time.sleep(3)
         homepage.getvendertype().click()
         homepage.getvendertypeselect().click()
         time.sleep(2)
@@ -244,21 +262,34 @@ class TestTwo(BaseClass):
 
         if not re.match(r"^[a-zA-Z]+$", vendor_data['first_name']):
             raise ValueError("Invalid First Name Format!")
-        homepage.getFirstName().send_keys(vendor_data['first_name'])
+        else:
+            homepage.getFirstName().send_keys(vendor_data['first_name'])
+
+        time.sleep(3)
 
         if not re.match(r"^[a-zA-Z]+$", vendor_data['last_name']):
             raise ValueError("Invalid Last Name Format!")
-        homepage.getLastName().send_keys(vendor_data['last_name'])
+        else:
+            homepage.getLastName().send_keys(vendor_data['last_name'])
+
+        time.sleep(3)
 
         if not re.match(r"^[\w\.-]+@[\w\.-]+\.\w+$", vendor_data['email2']):
             raise ValueError("Invalid Email Format!")
-        homepage.getEmail2().send_keys(vendor_data['email2'])
-        print("Correct Email")
+        else:
+            homepage.getEmail2().send_keys(vendor_data['email2'])
+            print("Correct Email")
+
+        time.sleep(3)
 
         if not re.match(r"^\d{10}$", vendor_data['phone']):
             raise ValueError("Invalid Phone Number! Must be 10 digits.")
-        homepage.getPhone().send_keys(vendor_data['phone'])
-        print("Correct Phone Number")
+
+        else:
+            homepage.getPhone().send_keys(vendor_data['phone'])
+            print("Correct Phone Number")
+
+        time.sleep(3)
 
         homepage.getNext().click()
         time.sleep(2)
