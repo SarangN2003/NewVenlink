@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 name: Deploy to AWS Fargate
 
 on:
@@ -64,4 +63,3 @@ jobs:
       - name: Update ECS Service
         run: |
           aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --task-definition $ECS_TASK_DEFINITION --force-new-deployment
->>>>>>> 57d2b258827d5cc57e958d45dd0e35a7091b173c
