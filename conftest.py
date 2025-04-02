@@ -141,7 +141,7 @@ sns_client = boto3.client("sns", region_name="eu-north-1")
 
 
 def send_sns_notification():
-    message = "Test execution completed successfully. Check the report for details."
+    message = "Message Send Successfully."
     subject = "Test Execution Report"
 
     try:
