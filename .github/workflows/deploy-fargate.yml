@@ -1,4 +1,4 @@
-name: Deploy to AWS Fargate
+name: Deploy to AWS Fargate with Notifications
 
 on:
   push:
@@ -29,39 +29,38 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
       
       - name: Update ECS Service
+        id: deploy
         run: |
           aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --task-definition $ECS_TASK_DEFINITION --force-new-deployment
       
-      - name: Setup Python for SNS
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-      
-      - name: Install boto3
-        run: pip install boto3
-      
-      - name: Send SNS Notification
+      - name: Send Success Notification
+        if: success()
         run: |
-          python <<EOF
-          import boto3
-          import os
-          
-          try:
-              sns = boto3.client('sns', region_name=os.environ['AWS_REGION'])
-              response = sns.publish(
-                  TopicArn=os.environ['SNS_TOPIC_ARN'],
-                  Subject='ECS Deployment Notification',
-                  Message=f'''Deployment Update:
-                  
-          Service: {os.environ['ECS_SERVICE']}
-          Cluster: {os.environ['ECS_CLUSTER']}
-          Task Definition: {os.environ['ECS_TASK_DEFINITION']}
-                  
-          Deployment initiated via GitHub Actions.
-                  '''
-              )
-              print('SNS notification sent successfully:', response)
-          except Exception as e:
-              print('Failed to send SNS notification:', str(e))
-              raise
-          EOF
+          aws sns publish \
+            --topic-arn "$SNS_TOPIC_ARN" \
+            --subject "✅ Deployment Successful: $ECS_SERVICE" \
+            --message "ECS deployment completed successfully!
+            
+Service: $ECS_SERVICE
+Cluster: $ECS_CLUSTER
+Task Definition: $ECS_TASK_DEFINITION
+
+Commit: $GITHUB_SHA
+Workflow: $GITHUB_WORKFLOW
+Run URL: https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+      
+      - name: Send Failure Notification
+        if: failure()
+        run: |
+          aws sns publish \
+            --topic-arn "$SNS_TOPIC_ARN" \
+            --subject "❌ Deployment Failed: $ECS_SERVICE" \
+            --message "ECS deployment failed!
+            
+Service: $ECS_SERVICE
+Cluster: $ECS_CLUSTER
+Task Definition: $ECS_TASK_DEFINITION
+
+Commit: $GITHUB_SHA
+Workflow: $GITHUB_WORKFLOW
+Run URL: https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
