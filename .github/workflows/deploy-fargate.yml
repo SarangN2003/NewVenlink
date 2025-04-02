@@ -8,9 +8,10 @@ on:
 
 env:
   AWS_REGION: eu-north-1
-  ECS_CLUSTER: VenlinkCluster  # Update with your actual ECS cluster name
-  ECS_SERVICE: VenLinkService  # Update with your ECS service name
+  ECS_CLUSTER: VenlinkCluster
+  ECS_SERVICE: VenLinkService
   ECS_TASK_DEFINITION: arn:aws:ecs:eu-north-1:203918861989:task-definition/VenlinkTaskDefinition:1
+  SNS_TOPIC_ARN: arn:aws:sns:eu-north-1:203918861989:Demo
 
 jobs:
   deploy:
@@ -30,3 +31,37 @@ jobs:
       - name: Update ECS Service
         run: |
           aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --task-definition $ECS_TASK_DEFINITION --force-new-deployment
+      
+      - name: Setup Python for SNS
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      
+      - name: Install boto3
+        run: pip install boto3
+      
+      - name: Send SNS Notification
+        run: |
+          python -c "
+          import boto3
+          import os
+          
+          try:
+              sns = boto3.client('sns', region_name=os.environ['AWS_REGION'])
+              response = sns.publish(
+                  TopicArn=os.environ['SNS_TOPIC_ARN'],
+                  Subject='ECS Deployment Notification',
+                  Message=f'''Deployment Update:
+                  
+Service: {os.environ['ECS_SERVICE']}
+Cluster: {os.environ['ECS_CLUSTER']}
+Task Definition: {os.environ['ECS_TASK_DEFINITION']}
+                  
+Deployment initiated via GitHub Actions.
+                  '''
+              )
+              print('SNS notification sent successfully:', response)
+          except Exception as e:
+              print('Failed to send SNS notification:', str(e))
+              raise
+          "
