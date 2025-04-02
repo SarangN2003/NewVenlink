@@ -32,27 +32,27 @@ jobs:
         id: deploy
         run: |
           aws ecs update-service \
-            --cluster $ECS_CLUSTER \
-            --service $ECS_SERVICE \
-            --task-definition $ECS_TASK_DEFINITION \
+            --cluster "$ECS_CLUSTER" \
+            --service "$ECS_SERVICE" \
+            --task-definition "$ECS_TASK_DEFINITION" \
             --force-new-deployment
       
       - name: Send Success Notification
         if: success()
         run: |
           aws sns publish \
-            --topic-arn $SNS_TOPIC_ARN \
-            --subject "✅ Deployment Successful" \
+            --topic-arn "$SNS_TOPIC_ARN" \
+            --subject "Deployment Successful ✅" \
             --message "ECS Service $ECS_SERVICE deployed successfully!
-Cluster: $ECS_CLUSTER
-Task Definition: $ECS_TASK_DEFINITION"
+            Cluster: $ECS_CLUSTER
+            Task Definition: $ECS_TASK_DEFINITION"
       
       - name: Send Failure Notification
         if: failure()
         run: |
           aws sns publish \
-            --topic-arn $SNS_TOPIC_ARN \
-            --subject "❌ Deployment Failed" \
+            --topic-arn "$SNS_TOPIC_ARN" \
+            --subject "Deployment Failed ❌" \
             --message "Failed to deploy ECS Service $ECS_SERVICE
-Cluster: $ECS_CLUSTER
-Task Definition: $ECS_TASK_DEFINITION"
+            Cluster: $ECS_CLUSTER
+            Task Definition: $ECS_TASK_DEFINITION"
