@@ -42,7 +42,7 @@ jobs:
       
       - name: Send SNS Notification
         run: |
-          python -c "
+          python <<EOF
           import boto3
           import os
           
@@ -51,16 +51,17 @@ jobs:
               response = sns.publish(
                   TopicArn=os.environ['SNS_TOPIC_ARN'],
                   Subject='ECS Deployment Notification',
-                  Message=f'''Deployment Update:               
-Service: {os.environ['ECS_SERVICE']}
-Cluster: {os.environ['ECS_CLUSTER']}
-Task Definition: {os.environ['ECS_TASK_DEFINITION']}
+                  Message=f'''Deployment Update:
                   
-Deployment initiated via GitHub Actions.
+          Service: {os.environ['ECS_SERVICE']}
+          Cluster: {os.environ['ECS_CLUSTER']}
+          Task Definition: {os.environ['ECS_TASK_DEFINITION']}
+                  
+          Deployment initiated via GitHub Actions.
                   '''
               )
               print('SNS notification sent successfully:', response)
           except Exception as e:
               print('Failed to send SNS notification:', str(e))
               raise
-          "
+          EOF
