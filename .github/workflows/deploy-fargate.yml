@@ -1,4 +1,4 @@
-name: Deploy to AWS Fargate with Notifications
+name: Deploy to AWS Fargate
 
 on:
   push:
@@ -8,14 +8,13 @@ on:
 
 env:
   AWS_REGION: eu-north-1
-  ECS_CLUSTER: VenlinkCluster
-  ECS_SERVICE: VenLinkService
+  ECS_CLUSTER: VenlinkCluster  # Update with your actual ECS cluster name
+  ECS_SERVICE: VenLinkService  # Update with your ECS service name
   ECS_TASK_DEFINITION: arn:aws:ecs:eu-north-1:203918861989:task-definition/VenlinkTaskDefinition:1
-  SNS_TOPIC_ARN: arn:aws:sns:eu-north-1:203918861989:Demo
 
 jobs:
   deploy:
-    name: Deploy and Notify
+    name: Deploy to AWS Fargate
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -28,31 +27,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
       
-      - name: Deploy to ECS
-        id: deploy
+      - name: Update ECS Service
         run: |
-          aws ecs update-service \
-            --cluster "$ECS_CLUSTER" \
-            --service "$ECS_SERVICE" \
-            --task-definition "$ECS_TASK_DEFINITION" \
-            --force-new-deployment
-      
-      - name: Send Success Notification
-        if: success()
-        run: |
-          aws sns publish \
-            --topic-arn "$SNS_TOPIC_ARN" \
-            --subject "Deployment Successful ✅" \
-            --message "ECS Service $ECS_SERVICE deployed successfully!
-            Cluster: $ECS_CLUSTER
-            Task Definition: $ECS_TASK_DEFINITION"
-      
-      - name: Send Failure Notification
-        if: failure()
-        run: |
-          aws sns publish \
-            --topic-arn "$SNS_TOPIC_ARN" \
-            --subject "Deployment Failed ❌" \
-            --message "Failed to deploy ECS Service $ECS_SERVICE
-            Cluster: $ECS_CLUSTER
-            Task Definition: $ECS_TASK_DEFINITION"
+          aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --task-definition $ECS_TASK_DEFINITION --force-new-deployment
