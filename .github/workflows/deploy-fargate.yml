@@ -51,8 +51,7 @@ jobs:
               response = sns.publish(
                   TopicArn=os.environ['SNS_TOPIC_ARN'],
                   Subject='ECS Deployment Notification',
-                  Message=f'''Deployment Update:
-                  
+                  Message=f'''Deployment Update:               
 Service: {os.environ['ECS_SERVICE']}
 Cluster: {os.environ['ECS_CLUSTER']}
 Task Definition: {os.environ['ECS_TASK_DEFINITION']}
