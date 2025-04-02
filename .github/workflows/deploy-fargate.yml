@@ -15,7 +15,7 @@ env:
 
 jobs:
   deploy:
-    name: Deploy to AWS Fargate
+    name: Deploy and Notify
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -28,39 +28,31 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
       
-      - name: Update ECS Service
+      - name: Deploy to ECS
         id: deploy
         run: |
-          aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --task-definition $ECS_TASK_DEFINITION --force-new-deployment
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service $ECS_SERVICE \
+            --task-definition $ECS_TASK_DEFINITION \
+            --force-new-deployment
       
       - name: Send Success Notification
         if: success()
         run: |
           aws sns publish \
-            --topic-arn "$SNS_TOPIC_ARN" \
-            --subject "✅ Deployment Successful: $ECS_SERVICE" \
-            --message "ECS deployment completed successfully!
-            
-Service: $ECS_SERVICE
+            --topic-arn $SNS_TOPIC_ARN \
+            --subject "✅ Deployment Successful" \
+            --message "ECS Service $ECS_SERVICE deployed successfully!
 Cluster: $ECS_CLUSTER
-Task Definition: $ECS_TASK_DEFINITION
-
-Commit: $GITHUB_SHA
-Workflow: $GITHUB_WORKFLOW
-Run URL: https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+Task Definition: $ECS_TASK_DEFINITION"
       
       - name: Send Failure Notification
         if: failure()
         run: |
           aws sns publish \
-            --topic-arn "$SNS_TOPIC_ARN" \
-            --subject "❌ Deployment Failed: $ECS_SERVICE" \
-            --message "ECS deployment failed!
-            
-Service: $ECS_SERVICE
+            --topic-arn $SNS_TOPIC_ARN \
+            --subject "❌ Deployment Failed" \
+            --message "Failed to deploy ECS Service $ECS_SERVICE
 Cluster: $ECS_CLUSTER
-Task Definition: $ECS_TASK_DEFINITION
-
-Commit: $GITHUB_SHA
-Workflow: $GITHUB_WORKFLOW
-Run URL: https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+Task Definition: $ECS_TASK_DEFINITION"
