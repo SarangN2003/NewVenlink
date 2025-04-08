@@ -1,0 +1,17 @@
+version: 0.2 
+phases: 
+  pre_build: 
+    commands: 
+      - echo Logging in to Amazon ECR... 
+      - aws --version 
+      - $(aws ecr get-login --no-include-email --region eu-north-1) 
+      - IMAGE_URI=203918861989.dkr.ecr.eu-north-1.amazonaws.com/venlink-image:latest 
+  build: 
+    commands: 
+      - echo Building Docker image... 
+      - docker build -t %%IMAGE_URI%% . 
+  post_build: 
+    commands: 
+      - echo Pushing image to ECR... 
+      - docker push %%IMAGE_URI%% 
+      - echo Image pushed successfully: %%IMAGE_URI%% 
