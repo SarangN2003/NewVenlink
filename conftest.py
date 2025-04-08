@@ -84,11 +84,7 @@ import base64
 # from selenium import webdriver
 # from selenium.webdriver.chrome.options import Options
 # import os
-<<<<<<< HEAD
 #
-=======
-
->>>>>>> 638c6880806c3e9144652ba9f34042da717c7151
 # @pytest.fixture(scope="class")
 # def setup(request):
 #     chromeoptions = Options()
@@ -96,28 +92,16 @@ import base64
 #     chromeoptions.add_argument("--no-sandbox")
 #     chromeoptions.add_argument("--disable-dev-shm-usage")
 #     chromeoptions.add_argument("--disable-gpu")
-<<<<<<< HEAD
 #
 #     # Set unique user data directory
 #     user_data_dir = f"/tmp/chrome-user-data-{os.getpid()}"
 #     chromeoptions.add_argument(f"--user-data-dir={user_data_dir}")
 #
-=======
-
-#     # Set unique user data directory
-#     user_data_dir = f"/tmp/chrome-user-data-{os.getpid()}"
-#     chromeoptions.add_argument(f"--user-data-dir={user_data_dir}")
-
->>>>>>> 638c6880806c3e9144652ba9f34042da717c7151
 #     driver = webdriver.Chrome(options=chromeoptions)
 #     driver.get("https://venlink--dev3.sandbox.my.site.com/customer/login")
 #     print("Browser successfully launched")
 #     print("Current URL:", driver.current_url)
-<<<<<<< HEAD
 #
-=======
-
->>>>>>> 638c6880806c3e9144652ba9f34042da717c7151
 #     driver.maximize_window()
 #     driver.implicitly_wait(5)
 #     request.cls.driver = driver
@@ -134,7 +118,6 @@ import base64
 
 
 
-<<<<<<< HEAD
 
 
 
@@ -792,9 +775,6 @@ import base64
 
 
 ##############
-=======
-###Use For AWS SNS
->>>>>>> 638c6880806c3e9144652ba9f34042da717c7151
 import pytest
 import boto3
 from selenium import webdriver
@@ -948,26 +928,6 @@ def send_sns_notification(status, report_path=None):
         print("Failed to send SNS notification:", str(e))
 
 
-# AWS SNS Configuration
-SNS_TOPIC_ARN = "arn:aws:sns:eu-north-1:203918861989:Demo"
-sns_client = boto3.client("sns", region_name="eu-north-1")
-
-
-def send_sns_notification():
-    message = "Message Send Successfully."
-    subject = "Test Execution Report"
-
-    try:
-        response = sns_client.publish(
-            TopicArn=SNS_TOPIC_ARN,
-            Message=message,
-            Subject=subject
-        )
-        print("SNS Notification Sent! Message ID:", response["MessageId"])
-    except Exception as e:
-        print("Failed to send SNS notification:", str(e))
-
-
 @pytest.fixture(scope="class")
 def setup(request):
     global screenshot_counter
@@ -986,7 +946,6 @@ def setup(request):
     # Create regular driver
     driver = webdriver.Chrome(options=chromeoptions)
 
-<<<<<<< HEAD
     # Wrap the driver with event listener for screenshots
     event_driver = EventFiringWebDriver(driver, ScreenshotListener())
 
@@ -1005,18 +964,10 @@ def setup(request):
     request.cls.driver = event_driver
     yield event_driver
     event_driver.quit()
-=======
-    driver.maximize_window()
-    driver.implicitly_wait(5)
-    request.cls.driver = driver
-    yield driver
-    driver.quit()
->>>>>>> 638c6880806c3e9144652ba9f34042da717c7151
 
 
 @pytest.hookimpl(tryfirst=True)
 def pytest_sessionfinish(session, exitstatus):
-<<<<<<< HEAD
     """Send notification after all tests complete"""
     print("\nAll tests completed. Determining status...")
 
@@ -1036,7 +987,3 @@ def pytest_sessionfinish(session, exitstatus):
         except Exception as e:
             print(f"Failed to delete {file}: {str(e)}")
 
-=======
-    print("All tests completed. Sending SNS notification...")
-    send_sns_notification()
->>>>>>> 638c6880806c3e9144652ba9f34042da717c7151
