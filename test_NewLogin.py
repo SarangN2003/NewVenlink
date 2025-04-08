@@ -170,14 +170,21 @@ class TestTwo(BaseClass):
             # Initialize page objects
             homepage = HomePage1(self.driver)
 
+
             # Execute test sections with safety wrappers
             self._execute_section("Customer Login", self._customer_login, homepage)
             self._execute_section("Vendor Request", self._vendor_request, homepage)
 
             log.info("========== TEST COMPLETED SUCCESSFULLY ==========")
 
+
+
         except BaseException as e:  # Catches ALL exceptions including KeyboardInterrupt
             self._handle_critical_failure(e)
+
+
+            self._handle_critical_failure(e)
+
             raise  # Re-raise to ensure pytest marks test as failed
 
         finally:
@@ -189,6 +196,7 @@ class TestTwo(BaseClass):
     def _customer_login(self, homepage):
         """All customer login steps with validations"""
         print("\nStarting Customer Login...")
+
 
         # Test data
         credentials = {
@@ -202,6 +210,7 @@ class TestTwo(BaseClass):
         else:
             homepage.getEmail().send_keys(credentials['username'])
             print("Entered email:", credentials['username'])
+
 
         # Password entry
         if not re.match(r"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$", credentials['password']):
@@ -314,3 +323,5 @@ class TestTwo(BaseClass):
         print(f"Critical Error Message: {str(exception)}")
         print("Full Stack Trace:")
         traceback.print_exc()
+
+

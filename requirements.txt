@@ -1,3 +1,13 @@
 selenium
 pytest
 pytest-html
+weasyprint
+boto3
+Pillow
+fpdf
+reportlab
+beautifulsoup4
+fpdf2
+PyPDF2
+pdfkit
+webdriver-manager

@@ -1,6 +1,0 @@
-2025-03-29 10:46:35,414 : INFO : test_VendorR : Logger initialized successfully
-2025-03-29 10:46:35,414 : INFO : test_VendorR : Test execution started
-2025-03-29 10:46:40,481 : INFO : test_VendorR : Entered email: john.doe@hypermatica.com.dev3
-2025-03-29 10:46:40,515 : INFO : test_VendorR : Valid password entered
-2025-03-29 10:46:43,596 : INFO : test_VendorR : Sign-in button clicked successfully
-2025-03-29 10:46:54,336 : INFO : test_VendorR : Vendor request submitted successfully
