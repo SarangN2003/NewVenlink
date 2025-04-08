@@ -7,18 +7,16 @@ phases:
       - aws --version
       - aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin 203918861989.dkr.ecr.eu-north-1.amazonaws.com
       - REPOSITORY_URI=203918861989.dkr.ecr.eu-north-1.amazonaws.com/venlinkrepo
-      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
 
   build:
     commands:
       - echo Build started on `date`
-      - docker build -t $REPOSITORY_URI:$IMAGE_TAG -t $REPOSITORY_URI:latest .
+      - docker build -t $REPOSITORY_URI:latest .
 
   post_build:
     commands:
       - echo Build completed on `date`
-      - echo Pushing Docker images...
-      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - echo Pushing the Docker image tagged as latest...
       - docker push $REPOSITORY_URI:latest
       - echo Writing image definitions file...
       - printf '[{"name":"vencontainer","imageUri":"%s"}]' $REPOSITORY_URI:latest > imagedefinitions.json
