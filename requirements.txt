@@ -11,3 +11,4 @@ fpdf2
 PyPDF2
 pdfkit
 webdriver-manager
+rstr
