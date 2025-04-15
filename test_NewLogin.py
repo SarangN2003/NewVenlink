@@ -780,7 +780,7 @@ from selenium.common.exceptions import NoSuchElementException
 import homePage
 from Logger import BaseClass
 from homePage import HomePage1
-from customerLogin import perform_customer_login, username, password  # 🆕 Imported here
+
 from test_data import CUSTOMER_CREDENTIALS, VENDOR_DATA
 from customerLogin import perform_customer_login
 
