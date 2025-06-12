@@ -6,7 +6,7 @@ phases:
       - echo Logging in to Amazon ECR...
       - aws --version
       - aws ecr get-login-password --region eu-north-1 | docker login --username AWS --password-stdin 203918861989.dkr.ecr.eu-north-1.amazonaws.com
-      - REPOSITORY_URI=203918861989.dkr.ecr.eu-north-1.amazonaws.com/venlinkrepo
+      - REPOSITORY_URI=203918861989.dkr.ecr.eu-north-1.amazonaws.com/demo
 
   build:
     commands:
