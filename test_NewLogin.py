@@ -774,14 +774,19 @@ import re
 import time
 import traceback
 import pytest
+
+
 from selenium.webdriver import ActionChains, Keys
 from selenium.common.exceptions import NoSuchElementException
+
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 import homePage
 from Logger import BaseClass
 from homePage import HomePage1
 
-from test_data import CUSTOMER_CREDENTIALS, VENDOR_DATA
+from test_data import CUSTOMER_CREDENTIALS, VENDOR_DATA, ACCOUNT_INFORMATION
 from customerLogin import perform_customer_login
 
 class TestVendorRequest(BaseClass):
@@ -881,19 +886,36 @@ class TestVendorRequest(BaseClass):
             if not re.match(r"^[a-zA-Z]+$", invalid_last):
                 raise ValueError("Invalid Last Name Format!")
 
+
+
     # Invalid vendor email test cases
+    # invalid_vendor_emails = [
+    #     rstr.xeger(r'^[a-zA-Z0-9._%+-]+[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'),  # no @
+    #     rstr.xeger(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+$'),  # no TLD
+    #     rstr.xeger(r'^@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'),  # no local part
+    #     rstr.xeger(r'^[a-zA-Z0-9._%+-]+@\.[a-zA-Z]{2,}$')  # no domain
+    # ]
+    #
+    # @pytest.mark.parametrize("invalid_email2", invalid_vendor_emails)
+    # def test_invalid_vendor_email(self, invalid_email2):
+    #     with pytest.raises(ValueError):
+    #         print(f"Testing invalid vendor email: {invalid_email2}")
+    #         if not re.match(r"^[\w\.-]+@[\w\.-]+\.\w+$", invalid_email2):
+    #             raise ValueError("Invalid Email Format!")
+
     invalid_vendor_emails = [
-        rstr.xeger(r'^[a-zA-Z0-9._%+-]+[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'),  # no @
-        rstr.xeger(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+$'),  # no TLD
-        rstr.xeger(r'^@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'),  # no local part
-        rstr.xeger(r'^[a-zA-Z0-9._%+-]+@\.[a-zA-Z]{2,}$')  # no domain
+        rstr.xeger(r'[a-zA-Z0-9._%+-]+[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'),  # missing '@'
+        rstr.xeger(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+'),  # missing TLD (no .com)
+        rstr.xeger(r'@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}'),  # missing local part
+        rstr.xeger(r'[a-zA-Z0-9._%+-]+@\.[a-zA-Z]{2,}'),  # domain starts with dot
+        rstr.xeger(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-z]{1}'),  # too short TLD
     ]
 
     @pytest.mark.parametrize("invalid_email2", invalid_vendor_emails)
     def test_invalid_vendor_email(self, invalid_email2):
         with pytest.raises(ValueError):
             print(f"Testing invalid vendor email: {invalid_email2}")
-            if not re.match(r"^[\w\.-]+@[\w\.-]+\.\w+$", invalid_email2):
+            if not re.match(r"^[\w\.-]+@[\w\.-]+\.\w{2,}$", invalid_email2):
                 raise ValueError("Invalid Email Format!")
 
     # Invalid phone test cases (kept as you had them)
@@ -913,27 +935,147 @@ class TestVendorRequest(BaseClass):
 
     # --------------------------
 
-    def _vendor_request(self, homepage, vendor_data):
+    def _vendor_request(self, homepage, VENDOR_DATA):
         print("\nStarting Vendor Request...")
         actions = ActionChains(self.driver)
         homepage.getclick().click()
         actions.send_keys(Keys.PAGE_DOWN).perform()
 
-        print(
-            f"Entering vendor details: {vendor_data['name']}, {vendor_data['business_case']}, {vendor_data['first_name']}, {vendor_data['last_name']}, {vendor_data['email2']}, {vendor_data['phone']}")
-        homepage.getName().send_keys(vendor_data['name'])
+        # print(
+        #     f"Entering vendor details: {VENDOR_DATA['name']}, {VENDOR_DATA['business_case']}, {VENDOR_DATA['first_name']}, {VENDOR_DATA['last_name']}, {VENDOR_DATA['email2']}, {VENDOR_DATA['phone']}")
+        homepage.getName().send_keys(VENDOR_DATA['name'])
         homepage.getvendertype().click()
-        time.sleep(3)
+        time.sleep(2)
         homepage.getvendertypeselect().click()
-        time.sleep(3)
-        homepage.getBusinessCase().send_keys(vendor_data['business_case'])
-        homepage.getFirstName().send_keys(vendor_data['first_name'])
-        homepage.getLastName().send_keys(vendor_data['last_name'])
-        homepage.getEmail2().send_keys(vendor_data['email2'])
-        homepage.getPhone().send_keys(vendor_data['phone'])
+        time.sleep(2)
+        homepage.getBusinessCase().send_keys(VENDOR_DATA['business_case'])
+        homepage.getFirstName().send_keys(VENDOR_DATA['first_name'])
+        homepage.getLastName().send_keys(VENDOR_DATA['last_name'])
+        homepage.getEmail2().send_keys(VENDOR_DATA['email2'])
+        homepage.getPhone().send_keys(VENDOR_DATA['phone'])
 
         try:
             homepage.getNext().click()
             print("Next Button Clicked successfully")
         except AttributeError:
             raise NoSuchElementException("Next button was not found")
+
+
+    ###Second Page
+
+        # homepage.getTypeAService().click()
+        # time.sleep(3)
+        # homepage.getServices().click()
+        # homepage.getTypeALocation().click()
+        # homepage.getLocations().click()
+        # time.sleep(2)
+        # homepage.getNext().click()
+        # time.sleep(1)
+
+
+        try:
+            homepage.getTypeAService().click()
+            time.sleep(3)
+        except Exception as e:
+            print("Error clicking Type A Service:")
+            traceback.print_exc()
+            raise
+
+        try:
+            homepage.getServices().click()
+        except Exception as e:
+            print("Error clicking Services:")
+            traceback.print_exc()
+            raise
+
+        try:
+            homepage.getTypeALocation().click()
+        except Exception as e:
+            print("Error clicking Type A Location:")
+            traceback.print_exc()
+            raise
+
+        try:
+            homepage.getLocations().click()
+            time.sleep(2)
+        except Exception as e:
+            print("Error clicking Locations:")
+            traceback.print_exc()
+            raise
+
+        try:
+            homepage.getNext().click()
+            time.sleep(1)
+        except Exception as e:
+            print("Error clicking Next:")
+            traceback.print_exc()
+            raise
+
+        ##Third Page
+        homepage.getRadio1().click()
+        time.sleep(1)
+        homepage.getRadio2().click()
+        time.sleep(1)
+        homepage.getRadio3().click()
+        time.sleep(1)
+        homepage.getRadio4().click()
+        time.sleep(2)
+
+        actions = ActionChains(self.driver)
+        actions.send_keys(Keys.PAGE_DOWN).perform()  # Scrolls down one page
+        time.sleep(2)
+
+        homepage.getSelectAnOption().click()
+        time.sleep(2)
+        homepage.getSelectAnOptionDropdown().click()
+        time.sleep(2)
+        homepage.getSave().click()
+        time.sleep(10)
+
+    ##New Vendor
+        homepage.getAction().click()
+        time.sleep(5)
+        wait = WebDriverWait(self.driver, 10)
+        approve_button = wait.until(EC.element_to_be_clickable(homePage.VendorActionLocators(self.driver).getApprove()))
+        approve_button.click()
+        # homePage.VendorActionLocators(self.driver).getApprove().click()
+        time.sleep(10)
+        homepage.getAction2().click()
+        time.sleep(5)
+        # homePage.VendorActionLocators(self.driver).getEdit().click()
+        wait = WebDriverWait(self.driver, 10)
+        edit_button = wait.until(EC.element_to_be_clickable(homePage.VendorActionLocators(self.driver).getEdit()))
+        edit_button.click()
+        time.sleep(5)
+
+###Edit/Abou/Account Information####
+        homepage.getLegal_Entity_Name().click()
+        time.sleep(2)
+        homepage.getLegal_Entity_Name().send_keys(ACCOUNT_INFORMATION['Legal_Entity_Name'])
+        time.sleep(2)
+        homepage.getParent_Account().click()
+        time.sleep(3)
+        homepage.getParent_Account_click().click()
+        time.sleep(3)
+        homepage.getPhone_No().click()
+        time.sleep(2)
+        homepage.getPhone_No().send_keys(ACCOUNT_INFORMATION['Phone_No'])
+        time.sleep(2)
+        homepage.getWebsite().click()
+        time.sleep(2)
+        homepage.getWebsite().send_keys(ACCOUNT_INFORMATION['Website'])
+        time.sleep(2)
+        homepage.getClient_Vendor_ID().click()
+        time.sleep(2)
+        homepage.getClient_Vendor_ID().send_keys(ACCOUNT_INFORMATION['Client Vendor ID'])
+        time.sleep(2)
+        homepage.getAccount_Information().click()
+        time.sleep(5)
+
+
+
+
+
+
+
+

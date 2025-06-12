@@ -375,7 +375,7 @@ def setup(request):
     screenshot_counter = 1  # Reset counter for each test class
 
     chromeoptions = Options()
-    chromeoptions.add_argument("--headless")
+    chromeoptions.add_argument("--no-headless")
     chromeoptions.add_argument("--no-sandbox")
     chromeoptions.add_argument("--disable-dev-shm-usage")
     chromeoptions.add_argument("--disable-gpu")
@@ -390,9 +390,10 @@ def setup(request):
     # Wrap the driver with event listener for screenshots
     event_driver = EventFiringWebDriver(driver, ScreenshotListener())
 
-    event_driver.get("https://staging.venlink.ai/customer/login")
+    event_driver.get("https://venlink--dev3.sandbox.my.site.com/customer/login")
     print("Browser successfully launched")
     print("Current URL:", event_driver.current_url)
+
 
     event_driver.maximize_window()
     event_driver.implicitly_wait(5)
