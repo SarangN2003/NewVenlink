@@ -375,7 +375,7 @@ def setup(request):
     screenshot_counter = 1  # Reset counter for each test class
 
     chromeoptions = Options()
-    chromeoptions.add_argument("--no-headless")
+    chromeoptions.add_argument("--headless")
     chromeoptions.add_argument("--no-sandbox")
     chromeoptions.add_argument("--disable-dev-shm-usage")
     chromeoptions.add_argument("--disable-gpu")
